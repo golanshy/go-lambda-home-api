@@ -14,7 +14,7 @@ type Handler interface {
 }
 
 type lambdaHandler struct {
-	randomName string
+	helloeMessage string
 }
 
 type LambdaResponse struct {
@@ -23,7 +23,7 @@ type LambdaResponse struct {
 
 func (l lambdaHandler) Run(ctx context.Context, event events.APIGatewayCustomAuthorizerRequest) (Response, error) {
 	lambdaResponse := LambdaResponse{
-		Message: "Hello " + l.randomName,
+		Message: l.helloeMessage,
 	}
 
 	response, err := json.Marshal(lambdaResponse)
@@ -50,9 +50,9 @@ func (l lambdaHandler) Run(ctx context.Context, event events.APIGatewayCustomAut
 
 // NewLambdaHandler -
 func NewLambdaHandler(
-	randomName string,
+	helloeMessage string,
 ) *lambdaHandler {
 	return &lambdaHandler{
-		randomName: randomName,
+		helloeMessage: helloeMessage,
 	}
 }

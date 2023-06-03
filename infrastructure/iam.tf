@@ -36,19 +36,6 @@ data "aws_iam_policy_document" "logs" {
   }
 }
 
-data "aws_iam_policy_document" "homeAPiLogs" {
-  policy_id = "${local.homeApi}-lambda-logs"
-  version   = "2012-10-17"
-  statement {
-    effect  = "Allow"
-    actions = ["logs:CreateLogStream", "logs:PutLogEvents"]
-
-    resources = [
-      "arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/${local.homeApi}*:*"
-    ]
-  }
-}
-
 resource "aws_iam_policy" "logs" {
   name   = "${local.name}-lambda-logs"
   policy = data.aws_iam_policy_document.logs.json

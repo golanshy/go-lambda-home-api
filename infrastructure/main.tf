@@ -17,11 +17,9 @@ data "aws_caller_identity" "current" {}
 locals {
   account_id     = data.aws_caller_identity.current.account_id
   environment    = "dev"
-  lambda_handler = "hello"
-  name           = "go-lambda-terraform-setup"
-  home           = "home"
-  homeApi        = "home-api"
-  random_name    = "Morty"
+  lambda_handler = "home-api"
+  name           = "go-lambda-home-api"
+  random_name    = "Hello World"
   region         = "eu-west-2"
 }
 
