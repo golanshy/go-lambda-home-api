@@ -13,9 +13,6 @@ resource "aws_lambda_function" "func" {
   memory_size       = 1024
   timeout           = 30
 
-  s3_bucket = aws_s3_bucket.lambda_bucket.id
-  s3_key    = aws_s3_object.lambda_hello.key
-
   environment {
     variables = {
       HELLO_MESSAGE = local.hello_message

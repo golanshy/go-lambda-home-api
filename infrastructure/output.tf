@@ -1,3 +1,3 @@
-output "api_url" {
-  value = aws_api_gateway_stage.helloApi.invoke_url
+output "home_api_base_url" {
+  value = aws_apigatewayv2_stage.dev.invoke_url
 }
