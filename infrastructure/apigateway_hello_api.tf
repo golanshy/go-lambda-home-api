@@ -75,13 +75,13 @@ resource "aws_api_gateway_deployment" "helloApi" {
 }
 
 resource "aws_api_gateway_stage" "helloApi" {
-  stage_name    = local.environment
+  stage_name    = "${local.environment}-${local.hello_api}"
   rest_api_id   = aws_api_gateway_rest_api.helloApi.id
   deployment_id = aws_api_gateway_deployment.helloApi.id
 }
 
 resource "aws_lambda_permission" "helloApi" {
-  statement_id  = "${local.name}-AllowExecutionFromAPIGateway"
+  statement_id  = "${local.name}-${local.hello_api}-AllowExecutionFromAPIGateway"
   action = "lambda:InvokeFunction"
   function_name = local.name
   principal = "apigateway.amazonaws.com"

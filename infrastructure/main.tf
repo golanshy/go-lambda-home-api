@@ -19,6 +19,8 @@ locals {
   environment    = "dev"
   lambda_handler = "home-api"
   name           = "go-lambda-home-api"
+  hello_api      = "hello-api"
+  home_api       = "home-api"
   random_name    = "Hello World"
   region         = "eu-west-2"
 }
