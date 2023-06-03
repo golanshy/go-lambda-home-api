@@ -1,4 +1,4 @@
-package home_handler
+package api_home_handler
 
 import (
 	"context"

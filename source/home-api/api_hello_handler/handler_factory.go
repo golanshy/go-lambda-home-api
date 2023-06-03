@@ -1,4 +1,4 @@
-package hello_handler
+package api_hello_handler
 
 import (
 	"github.com/golanshy/go-lambda-home-api/config"
