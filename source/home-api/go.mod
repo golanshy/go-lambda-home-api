@@ -1,4 +1,4 @@
-module github.com/golanshy/go-lambda-home-api/source/hello
+module github.com/golanshy/go-lambda-home-api
 
 go 1.15
 

@@ -1,17 +1,17 @@
-package handler
+package config
 
 import (
 	"os"
 )
 
-type config struct {
+type Config struct {
 	helloMessage string
 }
 
 // NewConfigFromEnv -
-func NewConfigFromEnv() *config {
+func NewConfigFromEnv() *Config {
 
-	return &config{
+	return &Config{
 		helloMessage: os.Getenv("HELLO_MESSAGE"),
 	}
 }
