@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
+	"github.com/golanshy/go-lambda-home-api/data_models"
 	"github.com/golanshy/go-lambda-home-api/handler"
+	"log"
 	"net/http"
 )
 
@@ -30,10 +32,12 @@ func (l UnitLambdaHandler) HandleRequest(ctx context.Context, req events.APIGate
 	}
 
 	switch req.HTTPMethod {
-	case http.MethodPost:
-		return postUnit(req, res)
 	case http.MethodGet:
-		return getUnit(req, res)
+		return l.getUnit(ctx, req, res)
+	case http.MethodPost:
+		return l.insertUnitData(ctx, req, res)
+	case http.MethodPut:
+		return l.updateUnit(ctx, req, res)
 	}
 
 	lambdaResponse := LambdaResponse{
@@ -45,22 +49,22 @@ func (l UnitLambdaHandler) HandleRequest(ctx context.Context, req events.APIGate
 	return res, err
 }
 
-func getUnit(req events.APIGatewayProxyRequest, res handler.Response) (handler.Response, error) {
-	name, ok := req.QueryStringParameters["name"]
+func (l UnitLambdaHandler) getUnit(ctx context.Context, req events.APIGatewayProxyRequest, res handler.Response) (handler.Response, error) {
+	id, ok := req.QueryStringParameters["id"]
 
 	if !ok {
 		lambdaResponse := LambdaResponse{
-			Message: "Welcome unit!",
+			Message: "unit id missing",
 		}
 		response, err := json.Marshal(lambdaResponse)
 
-		res.StatusCode = http.StatusOK
+		res.StatusCode = http.StatusBadRequest
 		res.Body = string(response)
 		return res, err
 	}
 
 	lambdaResponse := LambdaResponse{
-		Message: fmt.Sprintf("Welcome unit, %s!", name),
+		Message: fmt.Sprintf("Get unit %s", id),
 	}
 	response, err := json.Marshal(lambdaResponse)
 	res.StatusCode = http.StatusOK
@@ -68,9 +72,40 @@ func getUnit(req events.APIGatewayProxyRequest, res handler.Response) (handler.R
 	return res, err
 }
 
-func postUnit(req events.APIGatewayProxyRequest, res handler.Response) (handler.Response, error) {
+func (l UnitLambdaHandler) insertUnitData(ctx context.Context, req events.APIGatewayProxyRequest, res handler.Response) (handler.Response, error) {
+
+	var unit data_models.Unit
+	err := json.Unmarshal([]byte(req.Body), &unit)
+	if err != nil {
+		log.Printf("error unmarshalling data - bad unit data")
+		lambdaResponse := LambdaResponse{
+			Message: fmt.Sprintf("bad unit data"),
+		}
+		response, _ := json.Marshal(lambdaResponse)
+		res.StatusCode = http.StatusBadRequest
+		res.Body = string(response)
+		return res, err
+	}
+
+	log.Printf("Calling InsertUnitData")
+	err = l.dbClient.InsertUnitData(ctx, &unit)
+	if err != nil {
+		log.Printf("InsertUnitData error: %s", err.Error())
+		lambdaResponse := LambdaResponse{
+			Message: fmt.Sprintf("failed storing unit data"),
+		}
+		response, _ := json.Marshal(lambdaResponse)
+		res.StatusCode = http.StatusInternalServerError
+		res.Body = string(response)
+		return res, err
+	}
+	res.StatusCode = http.StatusCreated
+	return res, err
+}
+
+func (l UnitLambdaHandler) updateUnit(ctx context.Context, req events.APIGatewayProxyRequest, res handler.Response) (handler.Response, error) {
 	lambdaResponse := LambdaResponse{
-		Message: fmt.Sprintf("Post unit!"),
+		Message: fmt.Sprintf("Put unit"),
 	}
 	response, err := json.Marshal(lambdaResponse)
 

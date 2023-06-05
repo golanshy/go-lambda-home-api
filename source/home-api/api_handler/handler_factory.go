@@ -14,9 +14,11 @@ import (
 func Create() handler.Handler {
 	config := config2.NewConfigFromEnv()
 	dbClient := home_db_repo.NewRepository(config)
-	helloHandler := api_hello_handler.Create(&dbClient)
-	homeHandler := api_home_handler.Create(&dbClient)
-	unitHandler := api_unit_handler.Create(&dbClient)
-	sensorHandler := api_sensor_handler.Create(&dbClient)
+
+	helloHandler := api_hello_handler.Create(nil)
+	homeHandler := api_home_handler.Create(dbClient)
+	unitHandler := api_unit_handler.Create(dbClient)
+	sensorHandler := api_sensor_handler.Create(dbClient)
+
 	return NewLambdaHandler(config, helloHandler, homeHandler, unitHandler, sensorHandler)
 }

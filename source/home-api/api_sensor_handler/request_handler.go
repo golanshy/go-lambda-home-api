@@ -46,21 +46,21 @@ func (l SensorLambdaHandler) HandleRequest(ctx context.Context, req events.APIGa
 }
 
 func getSensor(req events.APIGatewayProxyRequest, res handler.Response) (handler.Response, error) {
-	name, ok := req.QueryStringParameters["name"]
+	id, ok := req.QueryStringParameters["id"]
 
 	if !ok {
 		lambdaResponse := LambdaResponse{
-			Message: "Welcome sensor!",
+			Message: "sensor id missing",
 		}
 		response, err := json.Marshal(lambdaResponse)
 
-		res.StatusCode = http.StatusOK
+		res.StatusCode = http.StatusBadRequest
 		res.Body = string(response)
 		return res, err
 	}
 
 	lambdaResponse := LambdaResponse{
-		Message: fmt.Sprintf("Welcome sensor, %s!", name),
+		Message: fmt.Sprintf("Get sensor %s", id),
 	}
 	response, err := json.Marshal(lambdaResponse)
 	res.StatusCode = http.StatusOK
@@ -70,7 +70,7 @@ func getSensor(req events.APIGatewayProxyRequest, res handler.Response) (handler
 
 func postSensor(req events.APIGatewayProxyRequest, res handler.Response) (handler.Response, error) {
 	lambdaResponse := LambdaResponse{
-		Message: fmt.Sprintf("Post sensor!"),
+		Message: fmt.Sprintf("Post sensor"),
 	}
 	response, err := json.Marshal(lambdaResponse)
 

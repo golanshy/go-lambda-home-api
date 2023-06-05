@@ -46,21 +46,21 @@ func (l HomeLambdaHandler) HandleRequest(ctx context.Context, req events.APIGate
 }
 
 func getHome(req events.APIGatewayProxyRequest, res handler.Response) (handler.Response, error) {
-	name, ok := req.QueryStringParameters["name"]
+	id, ok := req.QueryStringParameters["id"]
 
 	if !ok {
 		lambdaResponse := LambdaResponse{
-			Message: "Welcome home!",
+			Message: "home id missing",
 		}
 		response, err := json.Marshal(lambdaResponse)
 
-		res.StatusCode = http.StatusOK
+		res.StatusCode = http.StatusBadRequest
 		res.Body = string(response)
 		return res, err
 	}
 
 	lambdaResponse := LambdaResponse{
-		Message: fmt.Sprintf("Welcome home, %s!", name),
+		Message: fmt.Sprintf("Get home %s", id),
 	}
 	response, err := json.Marshal(lambdaResponse)
 	res.StatusCode = http.StatusOK
@@ -70,7 +70,7 @@ func getHome(req events.APIGatewayProxyRequest, res handler.Response) (handler.R
 
 func postHome(req events.APIGatewayProxyRequest, res handler.Response) (handler.Response, error) {
 	lambdaResponse := LambdaResponse{
-		Message: fmt.Sprintf("Post home!"),
+		Message: fmt.Sprintf("Post home"),
 	}
 	response, err := json.Marshal(lambdaResponse)
 

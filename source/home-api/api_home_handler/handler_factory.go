@@ -5,17 +5,17 @@ import (
 )
 
 type HomeLambdaHandler struct {
-	db *home_db_repo.Homes
+	dbClient *home_db_repo.StoreRepository
 }
 
 // Create -
-func Create(db *home_db_repo.Homes) *HomeLambdaHandler {
-	return NewLambdaHandler(db)
+func Create(dbClient *home_db_repo.StoreRepository) *HomeLambdaHandler {
+	return NewLambdaHandler(dbClient)
 }
 
 // NewLambdaHandler -
-func NewLambdaHandler(db *home_db_repo.Homes) *HomeLambdaHandler {
+func NewLambdaHandler(dbClient *home_db_repo.StoreRepository) *HomeLambdaHandler {
 	return &HomeLambdaHandler{
-		db: db,
+		dbClient: dbClient,
 	}
 }

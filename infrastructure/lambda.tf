@@ -15,8 +15,8 @@ resource "aws_lambda_function" "func" {
 
   environment {
     variables = {
-      HELLO_MESSAGE   = local.hello_message
-      MONGO_URI      = data.aws_secretsmanager_secret_version.secret_credentials.secret_string
+      HELLO_MESSAGE = local.hello_message
+      SECRETS       = data.aws_secretsmanager_secret_version.secret_credentials.secret_string
     }
   }
 }

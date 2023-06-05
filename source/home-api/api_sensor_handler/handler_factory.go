@@ -5,17 +5,17 @@ import (
 )
 
 type SensorLambdaHandler struct {
-	db *home_db_repo.Homes
+	dbClient *home_db_repo.StoreRepository
 }
 
 // Create -
-func Create(db *home_db_repo.Homes) *SensorLambdaHandler {
-	return NewLambdaHandler(db)
+func Create(dbClient *home_db_repo.StoreRepository) *SensorLambdaHandler {
+	return NewLambdaHandler(dbClient)
 }
 
 // NewLambdaHandler -
-func NewLambdaHandler(db *home_db_repo.Homes) *SensorLambdaHandler {
+func NewLambdaHandler(dbClient *home_db_repo.StoreRepository) *SensorLambdaHandler {
 	return &SensorLambdaHandler{
-		db: db,
+		dbClient: dbClient,
 	}
 }
