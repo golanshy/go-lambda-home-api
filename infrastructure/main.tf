@@ -25,14 +25,14 @@ provider "aws" {
 data "aws_caller_identity" "current" {}
 
 locals {
-  account_id     = data.aws_caller_identity.current.account_id
-  environment    = "dev"
-  lambda_handler = "home-api"
-  name           = "go-lambda-api"
-  hello_api      = "hello-api"
-  home_api       = "home-api"
-  hello_message  = "Hello World"
-  region         = "eu-west-2"
+  account_id          = data.aws_caller_identity.current.account_id
+  environment         = "dev"
+  lambda_handler      = "home-api"
+  name                = "go-lambda-api"
+  hello_api           = "hello-api"
+  home_api            = "home-api"
+  hello_message       = "Hello World"
+  region              = "eu-west-2"
 }
 
 data "archive_file" "lambda_zip" {

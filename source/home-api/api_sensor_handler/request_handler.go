@@ -1,4 +1,4 @@
-package api_home_handler
+package api_sensor_handler
 
 import (
 	"context"
@@ -13,7 +13,7 @@ type LambdaResponse struct {
 	Message string
 }
 
-func (l HomeLambdaHandler) HandleRequest(ctx context.Context, req events.APIGatewayProxyRequest) (handler.Response, error) {
+func (l SensorLambdaHandler) HandleRequest(ctx context.Context, req events.APIGatewayProxyRequest) (handler.Response, error) {
 
 	res := handler.Response{
 		Headers: map[string]string{
@@ -31,9 +31,9 @@ func (l HomeLambdaHandler) HandleRequest(ctx context.Context, req events.APIGate
 
 	switch req.HTTPMethod {
 	case http.MethodPost:
-		return postHome(req, res)
+		return postSensor(req, res)
 	case http.MethodGet:
-		return getHome(req, res)
+		return getSensor(req, res)
 	}
 
 	lambdaResponse := LambdaResponse{
@@ -45,12 +45,12 @@ func (l HomeLambdaHandler) HandleRequest(ctx context.Context, req events.APIGate
 	return res, err
 }
 
-func getHome(req events.APIGatewayProxyRequest, res handler.Response) (handler.Response, error) {
+func getSensor(req events.APIGatewayProxyRequest, res handler.Response) (handler.Response, error) {
 	name, ok := req.QueryStringParameters["name"]
 
 	if !ok {
 		lambdaResponse := LambdaResponse{
-			Message: "Welcome home!",
+			Message: "Welcome sensor!",
 		}
 		response, err := json.Marshal(lambdaResponse)
 
@@ -60,7 +60,7 @@ func getHome(req events.APIGatewayProxyRequest, res handler.Response) (handler.R
 	}
 
 	lambdaResponse := LambdaResponse{
-		Message: fmt.Sprintf("Welcome home, %s!", name),
+		Message: fmt.Sprintf("Welcome sensor, %s!", name),
 	}
 	response, err := json.Marshal(lambdaResponse)
 	res.StatusCode = http.StatusOK
@@ -68,9 +68,9 @@ func getHome(req events.APIGatewayProxyRequest, res handler.Response) (handler.R
 	return res, err
 }
 
-func postHome(req events.APIGatewayProxyRequest, res handler.Response) (handler.Response, error) {
+func postSensor(req events.APIGatewayProxyRequest, res handler.Response) (handler.Response, error) {
 	lambdaResponse := LambdaResponse{
-		Message: fmt.Sprintf("Post home!"),
+		Message: fmt.Sprintf("Post sensor!"),
 	}
 	response, err := json.Marshal(lambdaResponse)
 

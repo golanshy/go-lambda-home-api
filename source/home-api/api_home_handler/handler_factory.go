@@ -1,21 +1,21 @@
 package api_home_handler
 
 import (
-	"github.com/golanshy/go-lambda-home-api/config"
+	"github.com/golanshy/go-lambda-home-api/repositories/home_db_repo"
 )
 
 type HomeLambdaHandler struct {
-	config *config.Config
+	db *home_db_repo.Homes
 }
 
 // Create -
-func Create(c *config.Config) *HomeLambdaHandler {
-	return NewLambdaHandler(c)
+func Create(db *home_db_repo.Homes) *HomeLambdaHandler {
+	return NewLambdaHandler(db)
 }
 
 // NewLambdaHandler -
-func NewLambdaHandler(c *config.Config) *HomeLambdaHandler {
+func NewLambdaHandler(db *home_db_repo.Homes) *HomeLambdaHandler {
 	return &HomeLambdaHandler{
-		config: c,
+		db: db,
 	}
 }

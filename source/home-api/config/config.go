@@ -5,13 +5,15 @@ import (
 )
 
 type Config struct {
-	helloMessage string
+	HelloMessage string
+	MongoURI     string
 }
 
 // NewConfigFromEnv -
 func NewConfigFromEnv() *Config {
 
 	return &Config{
-		helloMessage: os.Getenv("HELLO_MESSAGE"),
+		HelloMessage: os.Getenv("HELLO_MESSAGE"),
+		MongoURI:     os.Getenv("MONGO_URI"),
 	}
 }
