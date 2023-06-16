@@ -4,7 +4,7 @@ import "time"
 
 type Unit struct {
 	API         string    `json:"api,omitempty"`
-	Id          string    `json:"id,omitempty"`
+	UnitId      string    `json:"unit_id,omitempty"`
 	Name        string    `json:"name,omitempty"`
 	Description string    `json:"description,omitempty"`
 	HomeId      string    `json:"home_id,omitempty"`

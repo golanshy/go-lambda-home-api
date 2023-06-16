@@ -8,6 +8,7 @@ import (
 	"github.com/golanshy/go-lambda-home-api/api_unit_handler"
 	config2 "github.com/golanshy/go-lambda-home-api/config"
 	"github.com/golanshy/go-lambda-home-api/handler"
+	"log"
 	"strings"
 )
 
@@ -44,6 +45,8 @@ func NewLambdaHandler(c *config2.Config, helloHandler handler.Handler, homeHandl
 
 func (l LambdaHandler) HandleRequest(ctx context.Context, req events.APIGatewayProxyRequest) (handler.Response, error) {
 
+	log.Printf("HandleRequest Path: %s", req.Path)
+
 	if strings.Contains(req.Path, helloPath) {
 		return l.helloHandler.HandleRequest(ctx, req)
 	} else if strings.Contains(req.Path, homePath) {
@@ -60,6 +63,7 @@ func (l LambdaHandler) HandleRequest(ctx context.Context, req events.APIGatewayP
 				"Access-Control-Allow-Credentials": "true",
 				"Cache-Control":                    "no-cache; no-store",
 				"Content-Type":                     "application/json",
+				"Accept":                           "application/json",
 				"Content-Security-Policy":          "default-src self",
 				"Strict-Transport-Security":        "max-age=31536000; includeSubDomains",
 				"X-Content-Type-Options":           "nosniff",

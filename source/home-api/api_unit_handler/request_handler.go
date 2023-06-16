@@ -22,6 +22,7 @@ func (l UnitLambdaHandler) HandleRequest(ctx context.Context, req events.APIGate
 			"Access-Control-Allow-Origin":      "*",
 			"Access-Control-Allow-Credentials": "true",
 			"Cache-Control":                    "no-cache; no-store",
+			"Accept":                           "application/json",
 			"Content-Type":                     "application/json",
 			"Content-Security-Policy":          "default-src self",
 			"Strict-Transport-Security":        "max-age=31536000; includeSubDomains",
@@ -63,21 +64,40 @@ func (l UnitLambdaHandler) getUnit(ctx context.Context, req events.APIGatewayPro
 		return res, err
 	}
 
-	lambdaResponse := LambdaResponse{
-		Message: fmt.Sprintf("Get unit %s", id),
+	unitDate, err := l.dbClient.GetUnitData(ctx, id)
+	if err != nil {
+		log.Printf("InsertUnitData error: %s", err.Error())
+		lambdaResponse := LambdaResponse{
+			Message: fmt.Sprintf("failed reading unit data"),
+		}
+		response, _ := json.Marshal(lambdaResponse)
+		res.StatusCode = http.StatusInternalServerError
+		res.Body = string(response)
+		return res, err
 	}
-	response, err := json.Marshal(lambdaResponse)
+
+	//unitDate := &data_models.Unit{
+	//	API:         data.API,
+	//	Id:          id,
+	//	Name:        data.Name,
+	//	Description: data.Description,
+	//	HomeId:      data.HomeId,
+	//	Sensors:     data.Sensors,
+	//	CreatedAt:   data.CreatedAt,
+	//	UpdatedAt:   data.UpdatedAt,
+	//}
+
+	response, _ := json.Marshal(unitDate)
 	res.StatusCode = http.StatusOK
 	res.Body = string(response)
-	return res, err
+	return res, nil
 }
 
 func (l UnitLambdaHandler) insertUnitData(ctx context.Context, req events.APIGatewayProxyRequest, res handler.Response) (handler.Response, error) {
 
 	var unit data_models.Unit
-	err := json.Unmarshal([]byte(req.Body), &unit)
-	if err != nil {
-		log.Printf("error unmarshalling data - bad unit data")
+	if err := json.Unmarshal([]byte(req.Body), &unit); err != nil {
+		log.Printf("error unmarshalling data - bad unit data %s", err.Error())
 		lambdaResponse := LambdaResponse{
 			Message: fmt.Sprintf("bad unit data"),
 		}
@@ -87,9 +107,9 @@ func (l UnitLambdaHandler) insertUnitData(ctx context.Context, req events.APIGat
 		return res, err
 	}
 
-	log.Printf("Calling InsertUnitData")
-	err = l.dbClient.InsertUnitData(ctx, &unit)
-	if err != nil {
+	log.Printf("Calling InsertUnitData %+v", unit)
+
+	if err := l.dbClient.InsertUnitData(ctx, &unit); err != nil {
 		log.Printf("InsertUnitData error: %s", err.Error())
 		lambdaResponse := LambdaResponse{
 			Message: fmt.Sprintf("failed storing unit data"),
@@ -100,7 +120,7 @@ func (l UnitLambdaHandler) insertUnitData(ctx context.Context, req events.APIGat
 		return res, err
 	}
 	res.StatusCode = http.StatusCreated
-	return res, err
+	return res, nil
 }
 
 func (l UnitLambdaHandler) updateUnit(ctx context.Context, req events.APIGatewayProxyRequest, res handler.Response) (handler.Response, error) {
