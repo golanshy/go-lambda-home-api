@@ -17,6 +17,13 @@ resource "aws_apigatewayv2_route" "get_hello" {
   target    = "integrations/${aws_apigatewayv2_integration.lambda_home_api.id}"
 }
 
+resource "aws_apigatewayv2_route" "get_config" {
+  api_id = aws_apigatewayv2_api.home_api.id
+
+  route_key = "GET /config"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_home_api.id}"
+}
+
 resource "aws_apigatewayv2_route" "get_home" {
   api_id = aws_apigatewayv2_api.home_api.id
 

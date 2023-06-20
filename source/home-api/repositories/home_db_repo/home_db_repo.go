@@ -82,9 +82,6 @@ func (s *StoreRepository) UpdateHome(ctx context.Context, home *data_models.Home
 
 func (s *StoreRepository) InsertUnitData(ctx context.Context, data *data_models.Unit) error {
 
-	// defer the closure
-	//defer mongoClient.Disconnect(context.TODO())
-
 	if data == nil {
 		return errors.New("no unit data")
 	}

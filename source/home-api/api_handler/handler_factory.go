@@ -1,6 +1,7 @@
 package api_handler
 
 import (
+	"github.com/golanshy/go-lambda-home-api/api_config_handler"
 	"github.com/golanshy/go-lambda-home-api/api_hello_handler"
 	"github.com/golanshy/go-lambda-home-api/api_home_handler"
 	"github.com/golanshy/go-lambda-home-api/api_sensor_handler"
@@ -15,10 +16,11 @@ func Create() handler.Handler {
 	cfg := config.NewConfigFromEnv()
 	dbClient := home_db_repo.NewRepository(cfg)
 
-	helloHandler := api_hello_handler.Create(nil)
+	helloHandler := api_hello_handler.Create()
+	configHandler := api_config_handler.Create()
 	homeHandler := api_home_handler.Create(dbClient)
 	unitHandler := api_unit_handler.Create(dbClient)
 	sensorHandler := api_sensor_handler.Create(dbClient)
 
-	return NewLambdaHandler(cfg, helloHandler, homeHandler, unitHandler, sensorHandler)
+	return NewLambdaHandler(cfg, helloHandler, configHandler, homeHandler, unitHandler, sensorHandler)
 }

@@ -14,6 +14,7 @@ import (
 
 var (
 	helloPath  = "hello"
+	configPath = "config"
 	homePath   = "home"
 	unitPath   = "unit"
 	sensorPath = "sensor"
@@ -23,6 +24,7 @@ var (
 type LambdaHandler struct {
 	config        *config2.Config
 	helloHandler  handler.Handler
+	configHandler handler.Handler
 	homeHandler   handler.Handler
 	unitHandler   handler.Handler
 	sensorHandler handler.Handler
@@ -33,10 +35,11 @@ type LambdaResponse struct {
 }
 
 // NewLambdaHandler -
-func NewLambdaHandler(c *config2.Config, helloHandler handler.Handler, homeHandler handler.Handler, unitHandler *api_unit_handler.UnitLambdaHandler, sensorHandler *api_sensor_handler.SensorLambdaHandler) *LambdaHandler {
+func NewLambdaHandler(c *config2.Config, helloHandler handler.Handler, configHandler handler.Handler, homeHandler handler.Handler, unitHandler *api_unit_handler.UnitLambdaHandler, sensorHandler *api_sensor_handler.SensorLambdaHandler) *LambdaHandler {
 	return &LambdaHandler{
 		config:        c,
 		helloHandler:  helloHandler,
+		configHandler: configHandler,
 		homeHandler:   homeHandler,
 		unitHandler:   unitHandler,
 		sensorHandler: sensorHandler,
@@ -49,6 +52,8 @@ func (l LambdaHandler) HandleRequest(ctx context.Context, req events.APIGatewayP
 
 	if strings.Contains(req.Path, helloPath) {
 		return l.helloHandler.HandleRequest(ctx, req)
+	} else if strings.Contains(req.Path, configPath) {
+		return l.configHandler.HandleRequest(ctx, req)
 	} else if strings.Contains(req.Path, homePath) {
 		return l.homeHandler.HandleRequest(ctx, req)
 	} else if strings.Contains(req.Path, unitPath) {
