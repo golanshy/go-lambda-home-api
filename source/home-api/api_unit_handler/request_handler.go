@@ -8,6 +8,7 @@ import (
 	"github.com/golanshy/go-lambda-home-api/data_models"
 	"github.com/golanshy/go-lambda-home-api/handler"
 	"log"
+	"math"
 	"net/http"
 	"sort"
 	"time"
@@ -94,7 +95,7 @@ func (l UnitLambdaHandler) getUnit(ctx context.Context, req events.APIGatewayPro
 		if sensor.SensorId == "0" {
 			for _, data := range sensor.TempData.Data {
 				unitDate.TimeSeries.TimeDateStamp = append(unitDate.TimeSeries.TimeDateStamp, data.CreatedAt.Local())
-				unitDate.TimeSeries.TimeStamp = append(unitDate.TimeSeries.TimeStamp, data.CreatedAt.In(loc).Format("15:04"))
+				unitDate.TimeSeries.TimeStamp = append(unitDate.TimeSeries.TimeStamp, data.CreatedAt.In(loc).Format("15:00"))
 			}
 			break
 		}
@@ -114,7 +115,7 @@ func (l UnitLambdaHandler) getUnit(ctx context.Context, req events.APIGatewayPro
 				tempReading = -15
 			}
 			unitDate.TimeSeries.TimeSeriesData[index].TempReadingsInC = append(unitDate.TimeSeries.TimeSeriesData[index].TempReadingsInC, tempReading)
-			unitDate.TimeSeries.TimeSeriesData[index].TempReadingsInPercentage = append(unitDate.TimeSeries.TimeSeriesData[index].TempReadingsInPercentage, (tempReading-5)/30.0)
+			unitDate.TimeSeries.TimeSeriesData[index].TempReadingsInPercentage = append(unitDate.TimeSeries.TimeSeriesData[index].TempReadingsInPercentage, float32(math.Max(float64(tempReading-5)/30.0, 0.0)))
 		}
 	}
 

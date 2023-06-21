@@ -174,7 +174,7 @@ func (s *StoreRepository) GetUnitData(ctx context.Context, unitId string) (*data
 		for _, sensor := range sensors {
 			if sensor != nil {
 				filter := bson.D{{"unit_id", unitId}, {"home_id", unitDto.HomeId}, {"sensor_id", sensor.SensorId}, {"created_at", bson.M{
-					"$gte": primitive.NewDateTimeFromTime(time.Now().Add(-time.Hour * 6)),
+					"$gte": primitive.NewDateTimeFromTime(time.Now().Add(-time.Hour * 8)),
 				},
 				}}
 				o := options.Find().SetSort(bson.M{"created_at": 1})
