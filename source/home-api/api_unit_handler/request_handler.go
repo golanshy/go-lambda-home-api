@@ -9,6 +9,8 @@ import (
 	"github.com/golanshy/go-lambda-home-api/handler"
 	"log"
 	"net/http"
+	"sort"
+	"time"
 )
 
 type LambdaResponse struct {
@@ -76,16 +78,45 @@ func (l UnitLambdaHandler) getUnit(ctx context.Context, req events.APIGatewayPro
 		return res, err
 	}
 
-	//unitDate := &data_models.Unit{
-	//	API:         data.API,
-	//	Id:          id,
-	//	Name:        data.Name,
-	//	Description: data.Description,
-	//	HomeId:      data.HomeId,
-	//	Sensors:     data.Sensors,
-	//	CreatedAt:   data.CreatedAt,
-	//	UpdatedAt:   data.UpdatedAt,
-	//}
+	sort.Slice(unitDate.Sensors, func(i, j int) bool {
+		return len(unitDate.Sensors[i].SensorId) <= len(unitDate.Sensors[j].SensorId)
+	})
+
+	unitDate.TimeSeries = data_models.TimeSeries{
+		TimeDateStamp:  make([]time.Time, 0),
+		TimeStamp:      make([]string, 0),
+		TimeSeriesData: make([]data_models.TimeSeriesData, 0),
+	}
+
+	loc, _ := time.LoadLocation("Europe/London")
+
+	for _, sensor := range unitDate.Sensors {
+		if sensor.SensorId == "0" {
+			for _, data := range sensor.TempData.Data {
+				unitDate.TimeSeries.TimeDateStamp = append(unitDate.TimeSeries.TimeDateStamp, data.CreatedAt.Local())
+				unitDate.TimeSeries.TimeStamp = append(unitDate.TimeSeries.TimeStamp, data.CreatedAt.In(loc).Format("15:04"))
+			}
+			break
+		}
+	}
+
+	for index, sensor := range unitDate.Sensors {
+		unitDate.TimeSeries.TimeSeriesData = append(unitDate.TimeSeries.TimeSeriesData, data_models.TimeSeriesData{
+			SensorId:          sensor.SensorId,
+			SensorName:        sensor.Name,
+			SensorDescription: sensor.Description,
+			TempReadingsInC:   make([]float32, 0),
+		})
+
+		for _, timeStamp := range unitDate.TimeSeries.TimeDateStamp {
+			tempReading, err := l.dbClient.GetTempForSensor(ctx, id, sensor.SensorId, timeStamp)
+			if err != nil {
+				tempReading = -15
+			}
+			unitDate.TimeSeries.TimeSeriesData[index].TempReadingsInC = append(unitDate.TimeSeries.TimeSeriesData[index].TempReadingsInC, tempReading)
+			unitDate.TimeSeries.TimeSeriesData[index].TempReadingsInPercentage = append(unitDate.TimeSeries.TimeSeriesData[index].TempReadingsInPercentage, (tempReading-5)/30.0)
+		}
+	}
 
 	response, _ := json.Marshal(unitDate)
 	res.StatusCode = http.StatusOK

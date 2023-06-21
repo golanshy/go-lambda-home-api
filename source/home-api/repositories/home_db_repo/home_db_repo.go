@@ -9,10 +9,12 @@ import (
 	"github.com/golanshy/go-lambda-home-api/data_models"
 	"github.com/golanshy/go-lambda-home-api/repositories/dtos"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"os"
+	"sort"
 	"strings"
 	"time"
 )
@@ -33,6 +35,7 @@ type Homes interface {
 	UpdateHome(ctx context.Context, home *data_models.Home) error
 	InsertUnitData(ctx context.Context, data *data_models.Unit) error
 	GetUnitData(ctx context.Context, unitId string) (*data_models.Unit, error)
+	GetTempForSensor(ctx context.Context, unitId string, sensorId string, timeStamp time.Time) (float32, error)
 }
 
 func init() {
@@ -170,8 +173,12 @@ func (s *StoreRepository) GetUnitData(ctx context.Context, unitId string) (*data
 	if sensors != nil {
 		for _, sensor := range sensors {
 			if sensor != nil {
-				filter := bson.D{{"unit_id", unitId}, {"home_id", unitDto.HomeId}, {"sensor_id", sensor.SensorId}}
-				o := options.Find().SetSort(bson.M{"updated_at": -1}).SetLimit(100)
+				filter := bson.D{{"unit_id", unitId}, {"home_id", unitDto.HomeId}, {"sensor_id", sensor.SensorId}, {"created_at", bson.M{
+					"$gte": primitive.NewDateTimeFromTime(time.Now().Add(-time.Hour * 12)),
+				},
+				}}
+				o := options.Find().SetSort(bson.M{"created_at": 1})
+
 				cur, err := temperatureCollection.Find(ctx, filter, o)
 				if err != nil {
 					log.Printf("failed to find temperature documents: %+v", err)
@@ -182,11 +189,13 @@ func (s *StoreRepository) GetUnitData(ctx context.Context, unitId string) (*data
 					log.Printf("failed reading temperature documents: %+v", err)
 					return nil, fmt.Errorf("failed reading temperature documents: %w", err)
 				}
+
+				sort.Slice(results, func(i, j int) bool {
+					return results[i].CreatedAt.Before(results[j].CreatedAt)
+				})
+
 				sensor.TempData = &data_models.TempData{
-					Data:              dtos.FromTempDTOs(results),
-					StartTime:         time.Time{},
-					EndTime:           time.Time{},
-					ResolutionInHours: 0,
+					Data: dtos.FromTempDTOs(results),
 				}
 			}
 		}
@@ -196,4 +205,29 @@ func (s *StoreRepository) GetUnitData(ctx context.Context, unitId string) (*data
 	unit.Sensors = sensors
 
 	return unit, nil
+}
+
+func (s *StoreRepository) GetTempForSensor(ctx context.Context, unitId string, sensorId string, timeStamp time.Time) (float32, error) {
+
+	filter := bson.D{
+		{"unit_id", unitId},
+		{"sensor_id", sensorId},
+		{"created_at", bson.M{
+			"$gte": primitive.NewDateTimeFromTime(timeStamp.Add(-time.Hour)),
+		},
+		},
+		{"created_at", bson.M{
+			"$lte": primitive.NewDateTimeFromTime(timeStamp.Add(time.Hour)),
+		},
+		}}
+
+	singleResult := temperatureCollection.FindOne(ctx, filter)
+	var result *dtos.TempRecordDTO
+	findErr := singleResult.Decode(&result)
+	if findErr != nil {
+		log.Printf("failed reading temperature documents: %+v", findErr)
+		return 0, findErr
+	}
+
+	return result.Temperature, nil
 }
