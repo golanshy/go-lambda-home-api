@@ -11,6 +11,7 @@ import (
 	"math"
 	"net/http"
 	"sort"
+	"strconv"
 	"time"
 )
 
@@ -55,6 +56,9 @@ func (l UnitLambdaHandler) HandleRequest(ctx context.Context, req events.APIGate
 
 func (l UnitLambdaHandler) getUnit(ctx context.Context, req events.APIGatewayProxyRequest, res handler.Response) (handler.Response, error) {
 	id, ok := req.QueryStringParameters["id"]
+	hoursValue := "12"
+	hoursValue, _ = req.QueryStringParameters["hours"]
+	hours, err := strconv.Atoi(hoursValue)
 
 	if !ok {
 		lambdaResponse := LambdaResponse{
@@ -67,7 +71,7 @@ func (l UnitLambdaHandler) getUnit(ctx context.Context, req events.APIGatewayPro
 		return res, err
 	}
 
-	unitDate, err := l.dbClient.GetUnitData(ctx, id)
+	unitDate, err := l.dbClient.GetUnitData(ctx, id, int32(hours+1))
 	if err != nil {
 		log.Printf("InsertUnitData error: %s", err.Error())
 		lambdaResponse := LambdaResponse{
@@ -115,7 +119,7 @@ func (l UnitLambdaHandler) getUnit(ctx context.Context, req events.APIGatewayPro
 				tempReading = -15
 			}
 			unitDate.TimeSeries.TimeSeriesData[index].TempReadingsInC = append(unitDate.TimeSeries.TimeSeriesData[index].TempReadingsInC, tempReading)
-			unitDate.TimeSeries.TimeSeriesData[index].TempReadingsInPercentage = append(unitDate.TimeSeries.TimeSeriesData[index].TempReadingsInPercentage, float32(math.Max(float64(tempReading-5)/30.0, 0.0)))
+			unitDate.TimeSeries.TimeSeriesData[index].TempReadingsInPercentage = append(unitDate.TimeSeries.TimeSeriesData[index].TempReadingsInPercentage, float32(math.Max(float64(tempReading)/40.0, 0.0)))
 		}
 	}
 

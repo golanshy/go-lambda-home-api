@@ -34,7 +34,7 @@ type Homes interface {
 	GetHome(ctx context.Context, homeID string) (*data_models.Home, error)
 	UpdateHome(ctx context.Context, home *data_models.Home) error
 	InsertUnitData(ctx context.Context, data *data_models.Unit) error
-	GetUnitData(ctx context.Context, unitId string) (*data_models.Unit, error)
+	GetUnitData(ctx context.Context, unitId string, hours int32) (*data_models.Unit, error)
 	GetTempForSensor(ctx context.Context, unitId string, sensorId string, timeStamp time.Time) (float32, error)
 }
 
@@ -141,7 +141,7 @@ func (s *StoreRepository) InsertUnitData(ctx context.Context, data *data_models.
 	return nil
 }
 
-func (s *StoreRepository) GetUnitData(ctx context.Context, unitId string) (*data_models.Unit, error) {
+func (s *StoreRepository) GetUnitData(ctx context.Context, unitId string, hours int32) (*data_models.Unit, error) {
 
 	if strings.TrimSpace(unitId) == "" {
 		return nil, errors.New("invalid unit id")
@@ -174,7 +174,7 @@ func (s *StoreRepository) GetUnitData(ctx context.Context, unitId string) (*data
 		for _, sensor := range sensors {
 			if sensor != nil {
 				filter := bson.D{{"unit_id", unitId}, {"home_id", unitDto.HomeId}, {"sensor_id", sensor.SensorId}, {"created_at", bson.M{
-					"$gte": primitive.NewDateTimeFromTime(time.Now().Add(-time.Hour * 8)),
+					"$gte": primitive.NewDateTimeFromTime(time.Now().Add(-time.Hour * time.Duration(hours))),
 				},
 				}}
 				o := options.Find().SetSort(bson.M{"created_at": 1})
