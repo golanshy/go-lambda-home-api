@@ -11,6 +11,7 @@ import (
 type ConfigResponse struct {
 	EnableLocalLogs bool `json:"enable_local_logs"`
 	DelayInSeconds  int  `json:"delay_in_seconds"`
+	DSTFix          int  `json:"dst_fix"`
 }
 
 func (l ConfigLambdaHandler) HandleRequest(ctx context.Context, req events.APIGatewayProxyRequest) (handler.Response, error) {
@@ -32,6 +33,7 @@ func (l ConfigLambdaHandler) HandleRequest(ctx context.Context, req events.APIGa
 	configResponse := ConfigResponse{
 		EnableLocalLogs: false,
 		DelayInSeconds:  1 * 60 * 60, // 1 hour
+		DSTFix:          1,           // Daylight Saving time = 1 hour
 	}
 	response, err := json.Marshal(configResponse)
 
