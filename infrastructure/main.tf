@@ -20,6 +20,7 @@ terraform {
 
 provider "aws" {
   region = "eu-west-2"
+  profile = "applylogic"
 }
 
 data "aws_caller_identity" "current" {}
