@@ -29,7 +29,7 @@ locals {
   account_id          = data.aws_caller_identity.current.account_id
   environment         = "dev"
   lambda_handler      = "home-api"
-  name                = "go-lambda-api"
+  name                = "go-lambda-home-api"
   hello_api           = "hello-api"
   home_api            = "home-api"
   hello_message       = "Hello World"

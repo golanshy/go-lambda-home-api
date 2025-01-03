@@ -18,13 +18,13 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 resource "aws_iam_role" "lambda" {
-  name                = "${local.name}-lambda"
+  name                = "${local.name}-home-api"
   assume_role_policy  = data.aws_iam_policy_document.assume_role.json
 }
 
 // Logs Policy
 data "aws_iam_policy_document" "logs" {
-  policy_id = "${local.name}-lambda-logs"
+  policy_id = "${local.name}-home-api-logs"
   version   = "2012-10-17"
   statement {
     effect  = "Allow"
@@ -37,7 +37,7 @@ data "aws_iam_policy_document" "logs" {
 }
 
 resource "aws_iam_policy" "logs" {
-  name   = "${local.name}-lambda-logs"
+  name   = "${local.name}-home-api-logs"
   policy = data.aws_iam_policy_document.logs.json
 }
 
